@@ -32,6 +32,7 @@ no warnings 'redefine';
 
 use Data::Dumper;
 use HTTP::Negotiate qw(choose);
+use IO::Handle::Util;
 
 our ($VERSION);
 our %serializer_names;
@@ -222,6 +223,20 @@ sub serialize_model_to_string {
 	return $string;
 }
 
+
+=item C<< serialize_model_to_io ( $model ) >>
+
+Serializes the C<< $model >>, returning the result as a IO::Handle.
+
+=cut
+
+sub serialize_model_to_io {
+	my $self	= shift;
+	my $model	= shift;
+	return io_from_string($self->serialize_model_to_string($model));
+}
+
+
 =item C<< serialize_iterator_to_file ( $file, $iterator ) >>
 
 Serializes the statement objects produced by C<< $iterator >>, printing the
@@ -264,6 +279,19 @@ sub serialize_iterator_to_string {
 	close($fh);
 	return $string;
 }
+
+=item C<< serialize_iterator_to_io ( $iterator ) >>
+
+Serializes the C<< $iterator >>, returning the result as a IO::Handle.
+
+=cut
+
+sub serialize_iterator_to_io {
+	my $self	= shift;
+	my $iterator	= shift;
+	return io_from_string($self->serialize_iterator_to_string($iterator));
+}
+
 
 =item C<< can_serialize ( $content_class ) >>
 
