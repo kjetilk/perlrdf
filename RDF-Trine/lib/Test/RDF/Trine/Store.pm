@@ -332,7 +332,7 @@ sub add_statement_tests_simple {
 		is( $store->size, 1, 'store has 1 statement after duplicate (quad) add' );
 	}
 
-	$retag_before = $store->etag;
+	$etag_before = $store->etag;
 	$store->remove_statement( $triple, $ex->d );
 	update_sleep($args);
    SKIP: {
