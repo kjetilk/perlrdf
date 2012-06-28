@@ -538,7 +538,6 @@ END
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
-@prefix scovo: <http://purl.org/NET/scovo#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix ent: <http://www.w3.org/ns/entailment/> .
 
@@ -556,10 +555,7 @@ END
 		a sd:Dataset ;
 		sd:defaultGraph [
 			a sd:Graph ;
-			void:statItem [
-				scovo:dimension void:numberOfTriples ;
-				rdf:value 100
-			] ;
+			void:triples 100
 		] ;
 	] ;
 	
@@ -570,20 +566,14 @@ END
 			sd:named <http://xmlns.com/foaf/0.1/> ;
 			sd:graphDescription [
 				a sd:Graph ;
-				void:statItem [
-					scovo:dimension void:numberOfTriples ;
-					rdf:value 608
-				] ;
+				void:triples 608
 			] ;
 		], [
 			a sd:NamedGraph ;
 			sd:named <http://kasei.us/sparql> ;
 			sd:graphDescription [
 				a sd:Graph ;
-				void:statItem [
-					scovo:dimension void:numberOfTriples ;
-					rdf:value 53
-				] ;
+				void:triples 53
 			] ;
 		] ;
 	] ;
@@ -602,7 +592,6 @@ END
 	my $namespaces	= {
 		rdfs	=> 'http://www.w3.org/2000/01/rdf-schema#',
 		xsd		=> 'http://www.w3.org/2001/XMLSchema#',
-		scovo	=> 'http://purl.org/NET/scovo#',
 		jena	=> 'java:com.hp.hpl.jena.query.function.library.',
 		sd		=> 'http://www.w3.org/ns/sparql-service-description#',
 		saddle	=> 'http://www.w3.org/2005/03/saddle/#',
