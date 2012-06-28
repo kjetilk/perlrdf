@@ -6,7 +6,6 @@
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
-	xmlns:scovo="http://purl.org/NET/scovo#"
 	xmlns:void="http://rdfs.org/ns/void#"
 	>
 	<head>
@@ -31,12 +30,8 @@
 			 <div class="description" typeof="sd:Dataset">
 				<div rel="sd:defaultGraph">
 				   <div class="description" typeof="rdfs:Resource">
-					  <div rel="void:statItem">
-						 <div class="description" typeof="rdfs:Resource">
-							<div rel="scovo:dimension" resource="http://rdfs.org/ns/void#numberOfTriples"></div>
-							<div property="rdf:value" content="12729" datatype="xsd:integer"></div>
-						 </div>
-					  </div>
+					  <div property="void:triples" content="12729" datatype="xsd:integer"></div>
+					
 				   </div>
 				</div>
 			 </div>
