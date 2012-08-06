@@ -22,6 +22,8 @@ no warnings 'redefine';
 use base qw(RDF::Trine::Store::DBI);
 
 use Scalar::Util qw(blessed reftype refaddr);
+use Digest::SHA qw(sha1_hex);
+use List::Util qw(sum);
 
 our $VERSION;
 BEGIN {
@@ -132,6 +134,18 @@ END
 		$dbh->do( "INSERT INTO Models (ID, Name) VALUES (${id}, ?)", undef, $name );
 	}
 	
+}
+
+sub etag {
+  my $self = shift;
+  my $l		= Log::Log4perl->get_logger("rdf.trine.store.dbi");
+  my @stats = $self->dbh->selectrow_array('SELECT tup_inserted, tup_updated, tup_deleted, xact_commit, stats_reset FROM pg_stat_database WHERE datname=?', {}, ($self->{database})) || { do { $l->trace( $self->dbh->errstr ); return }};
+  my $tagstuff = join("x", @stats[0..2]);
+  if (sum(@stats[0..2]) == 0) {
+	 # Then no tuples have been updated since last reset. Try reset time and xact_commit, which might change, but is usable once.
+	 $tagstuff = join("x", @stats[3..4]);
+  }
+  return sha1_hex($tagstuff);
 }
 
 
