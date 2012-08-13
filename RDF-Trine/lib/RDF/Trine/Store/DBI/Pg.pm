@@ -137,21 +137,21 @@ END
 }
 
 sub etag {
-  my $self = shift;
-  my $l		= Log::Log4perl->get_logger("rdf.trine.store.dbi");
-  my @stats = $self->dbh->selectrow_array('SELECT tup_inserted, tup_updated, tup_deleted, xact_commit FROM pg_stat_database WHERE datname=?', {}, ($self->dbh->{pg_db}));
-  if ($self->dbh->err) {
-	  $l->trace( $self->dbh->errstr );
-	  return;
-  };
-  my $tagstuff = join("x", @stats[0..2]);
-  if (sum(@stats[0..2]) == 0) {
-	 # Then no tuples have been updated since last reset. We then use
-	 # xact_commit, which might change in normal operation, but is
-	 # usable just after reset.
-	 $tagstuff = 'y' . $stats[3];
-  }
-  return sha1_hex($tagstuff);
+	my $self = shift;
+	my $l		= Log::Log4perl->get_logger("rdf.trine.store.dbi");
+	my @stats = $self->dbh->selectrow_array('SELECT tup_inserted, tup_updated, tup_deleted, xact_commit FROM pg_stat_database WHERE datname=?', {}, ($self->dbh->{pg_db}));
+	if ($self->dbh->err) {
+		$l->trace( $self->dbh->errstr );
+		return;
+	};
+	my $tagstuff = join("x", @stats[0..2]);
+	if (sum(@stats[0..2]) == 0) {
+		# Then no tuples have been updated since last reset. We then use
+		# xact_commit, which might change in normal operation, but is
+		# usable just after reset.
+		$tagstuff = 'y' . $stats[3];
+	}
+	return sha1_hex($tagstuff);
 }
 
 
