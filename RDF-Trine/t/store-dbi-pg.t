@@ -43,7 +43,7 @@ my $dbh	= DBI->connect( $dsn, $user, $pass );
 my $store	= RDF::Trine::Store::DBI::Pg->new( $model, $dbh );
 isa_ok( $store, 'RDF::Trine::Store::DBI::Pg' );
 
-Test::RDF::Trine::Store::all_store_tests($store, $data);
+Test::RDF::Trine::Store::all_store_tests($store, $data, undef, {update_sleep=>2});
 
 
 sub new_store {

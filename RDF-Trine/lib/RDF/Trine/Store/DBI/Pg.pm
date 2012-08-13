@@ -151,7 +151,6 @@ sub etag {
 	 # usable just after reset.
 	 $tagstuff = 'y' . $stats[3];
   }
-  warn "Foooo" . $tagstuff;
   return sha1_hex($tagstuff);
 }
 
