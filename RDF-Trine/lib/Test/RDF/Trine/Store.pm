@@ -671,26 +671,26 @@ sub blank_node_tests_triples {
 	is( $store->size, 3, 'store has 3 statements after (triple) add' );
 
 	{
-		my $count	= $store->count_statements( undef, undef, $blankfoo, undef );
+		my $count	= $store->count_statements( undef, undef, $blankfoo );
 		is( $count, 1, 'expected one object blank node' );
 	}
 
 	{
-		my $count	= $store->count_statements( $blankbar, undef, $blankfoo, undef );
+		my $count	= $store->count_statements( $blankbar, undef, $blankfoo );
 		is( $count, 0, 'expected zero subject-object blank node' );
 	}
 
 	{
-		my $count	= $store->count_statements( $blankfoo, undef, undef, $ex->d );
+		my $count	= $store->count_statements( $blankfoo, undef, undef );
 		is( $count, 1, 'expected one subject-context blank node' );
 	}
 
 	{
-		my $count	= $store->count_statements( $blankfoo, $ex->b, undef, undef );
+		my $count	= $store->count_statements( $blankfoo, $ex->b, undef );
 		is( $count, 1, 'expected one subject-predicate blank node' );
 	}
 
-	$store->remove_statements( undef, undef, $blankfoo, undef );
+	$store->remove_statements( undef, undef, $blankfoo );
 	is( $store->size, 2, 'expected two triples after remove statements' );
 	$store->remove_statement( $triple2 );
 	is( $store->size, 1, 'expected single triples after remove statement' );
