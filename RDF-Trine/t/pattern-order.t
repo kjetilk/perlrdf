@@ -166,6 +166,49 @@ note 'Testing Heuristic SPARQL Planner implementation';
 	is_deeply($got, $re, 'Final sort: All possible triple patterns in random order');
 }
 
+TODO: {
+	local $TODO = 'Need to fix the cartesian product problem';
+	my $name = 'one star, with chains, all two-variable patterns';
+	my $in = RDF::Trine::Pattern->new(
+												 statement(variable('author'), $foaf->knows, variable('person')),
+												 statement(variable('jrn1'), $dct->revised, variable('rev')),
+												 statement(variable('jrn1'), $foaf->maker, variable('author')),
+												 statement(variable('person'), $foaf->name, variable('name')),
+												);
+	my $re = RDF::Trine::Pattern->new(
+												 statement(variable('jrn1'), $dct->revised, variable('rev')),
+												 statement(variable('jrn1'), $foaf->maker, variable('author')),
+												 statement(variable('author'), $foaf->knows, variable('person')),
+												 statement(variable('person'), $foaf->name, variable('name')),
+												);
+	my @subgrouping = $in->subgroup;
+
+	is(scalar @subgrouping, 2, 'Two entries for ' . $name);
+	isa_ok(\@subgrouping, 'ARRAY', 'Subgroup produces array for ' . $name);
+
+	my @intriples = $in->triples;
+	my $ingroups = [ RDF::Trine::Pattern->new(@intriples[1,2]),
+						  RDF::Trine::Pattern->new(@intriples[0,3]) ];
+	my @retriples = $re->triples;
+	my $regroups = [ RDF::Trine::Pattern->new(@retriples[0,1]),
+						  RDF::Trine::Pattern->new(@retriples[2,3]) ];
+	cmp_bag([$subgrouping[0]->triples], [$ingroups->[0]->triples] , '1st pattern for ' . $name );
+	cmp_bag([$subgrouping[1]->triples], [$ingroups->[1]->triples] , '2st pattern for ' . $name );
+
+	is_deeply($subgrouping[0]->sort_triples, $regroups->[0], '1st group has the correct sort in ' . $name);
+	is_deeply($subgrouping[1]->sort_triples, $regroups->[1], '2st group has the correct sort in ' . $name);
+
+	my @sortgroups = ( $subgrouping[0]->sort_triples,
+							 $subgrouping[1]->sort_triples
+						  );
+
+	my $merge = RDF::Trine::Pattern->merge_patterns(@sortgroups);
+	isa_ok($merge, 'RDF::Trine::Pattern');
+
+	is_deeply($merge, $re, 'Sort with manual process in ' . $name);
+
+	is_deeply($in->sort_for_join_variables, $re, 'Final sort: ' . $name);
+}
 
 
 done_testing;
