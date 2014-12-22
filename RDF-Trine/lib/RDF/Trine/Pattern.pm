@@ -177,15 +177,67 @@ Given an array of patterns, this will merge them into one.
 
 sub merge_patterns {
 	my ($class, @patterns) = @_;
+	my %triples_by_tid;
 	my @all_triples;
 	foreach my $pattern (@patterns) {
 		unless (blessed($pattern) and $pattern->isa('RDF::Trine::Pattern')) {
 			throw RDF::Trine::Error -text => "Patterns to be merged must be patterns themselves";
 		}
+		foreach my $t ($pattern->triples) {
+			$triples_by_tid{ refaddr($t) } = $t;
+		}
 		push(@all_triples, $pattern->triples);
 	}
-	return $class->new(@all_triples);
+
+	my %triples_with_variable;
+	foreach my $t (@all_triples) {
+		my $tid	= refaddr($t);
+		foreach my $n ($t->nodes) {
+			if ($n->isa('RDF::Trine::Node::Variable')) {
+				my $var	= $n->name;
+				$triples_with_variable{ $var }{ $tid }++;
+			}
+		}
+	}
+	foreach my $var (keys %triples_with_variable) {
+		my @tids	= sort { $a <=> $b } keys %{ $triples_with_variable{ $var } };
+		$triples_with_variable{ $var } = \@tids;
+	}
+	my %variables_in_triple;
+	foreach my $var (keys %triples_with_variable) {
+		foreach my $tid (@{ $triples_with_variable{ $var } }) {
+			$variables_in_triple{ $tid }{ $var }++;
+		}
+	}
+	foreach my $tid (keys %variables_in_triple) {
+		my @vars	= sort keys %{ $variables_in_triple{ $tid } };
+		$variables_in_triple{ $tid } = \@vars;
+	}
+	my %used_vars;
+	my %used_tids;
+	my @sorted;
+	my $first	= shift(@all_triples); # start with the first triple in syntactic order
+	push(@sorted, $first);
+	$used_tids{ refaddr($first) }++;
+	foreach my $var (@{ $variables_in_triple{ refaddr($first) } }) {
+		$used_vars{ $var }++;
+	}
+	while (@all_triples) {
+		my @candidate_tids	= grep { not($used_tids{$_}) } map { @{ $triples_with_variable{ $_ } } } (keys %used_vars);
+		last unless scalar(@candidate_tids);
+		my $next_id	= shift(@candidate_tids);
+		my $next	= $triples_by_tid{ $next_id };
+		push(@sorted, $next);
+		$used_tids{ refaddr($next) }++;
+		foreach my $var (@{ $variables_in_triple{ refaddr($next) } }) {
+			$used_vars{ $var }++;
+		}
+		@all_triples	= grep { refaddr($_) != $next_id } @all_triples;
+	}
+	push(@sorted, @all_triples);
+	return $class->new(@sorted);
 }
+
 
 =item C<< sort_for_join_variables >>
 
